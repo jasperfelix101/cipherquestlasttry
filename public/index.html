@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cryptic Hunt</title>
     <style>
-
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -17,7 +16,6 @@
             background-image: url(https://cdn.britannica.com/07/258207-050-A97114B7/bbc-sherlock-benedict-cumberbatch-martin-freeman.jpg);
             color: white;
         }
-        
         .container {
             text-align: center;
             background: rgba(0, 0, 0, 0.8);
@@ -25,16 +23,13 @@
             border-radius: 10px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
         }
-
         h1 {
             margin-bottom: 20px;
         }
-
         p {
             font-size: 18px;
             margin-bottom: 15px;
         }
-
         input[type="text"] {
             padding: 10px;
             width: 100%;
@@ -43,7 +38,6 @@
             border-radius: 5px;
             font-size: 16px;
         }
-
         button {
             padding: 10px 20px;
             background-color: #6A0572;
@@ -53,22 +47,18 @@
             cursor: pointer;
             font-size: 16px;
         }
-
         button:hover {
             background-color: #45013b;
         }
-
         .level-message {
             font-size: 24px;
             margin-bottom: 20px;
             animation: fadeIn 1s ease-in;
         }
-
         @keyframes fadeIn {
             0% { opacity: 0; }
             100% { opacity: 1; }
         }
-
         img {
             max-width: 100%;
             height: auto;
@@ -93,52 +83,47 @@
 
         // Fetch the question from the server
         function updateQuestion() {
-    const questionContainer = document.getElementById("level-question");
+            const questionContainer = document.getElementById("level-question");
 
-    // Fetch question and image from backend for the current level
-    fetch(`http://localhost:3000/level/${currentLevel}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.question) {
-                // Create image element if available
-                const imgElement = data.image ? `<img src="${data.image}" alt="Level ${currentLevel + 1} Image" />` : "";
-
-                // Set the content (image + question)
-                questionContainer.innerHTML = `${imgElement}<p>${data.question}</p>`;
-            } else {
-                questionContainer.innerHTML = "<p>Congratulations! You've completed the cryptic hunt!</p>";
-                document.getElementById("answer-input").style.display = "none";  // Hide input after completion
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching level data:', error);
-            questionContainer.innerHTML = "<p>Error loading the level. Please try again later.</p>";
-        });
-}
-
-
+            // Fetch question and image from backend for the current level
+            fetch(`/level/${currentLevel}`)  // <--- Relative URL here!
+                .then(response => response.json())
+                .then(data => {
+                    if (data.question) {
+                        const imgElement = data.image ? `<img src="${data.image}" alt="Level ${currentLevel + 1} Image" />` : "";
+                        questionContainer.innerHTML = `${imgElement}<p>${data.question}</p>`;
+                    } else {
+                        questionContainer.innerHTML = "<p>Congratulations! You've completed the cryptic hunt!</p>";
+                        document.getElementById("answer-input").style.display = "none";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching level data:', error);
+                    questionContainer.innerHTML = "<p>Error loading the level. Please try again later.</p>";
+                });
+        }
 
         // Function to handle answer submission
         function submitAnswer() {
             const userAnswer = document.getElementById("answer-input").value.trim().toLowerCase();
 
-            fetch('http://localhost:3000/check-answer', {
+            fetch('/check-answer', {  // <--- Relative URL here!
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ level: currentLevel, answer: userAnswer })
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.correct) {
-                        currentLevel++;  // Move to the next level
-                        localStorage.setItem("crypticHuntLevel", currentLevel);  // Save progress
-                        updateQuestion();  // Load the next question
-                        document.getElementById("answer-input").value = "";  // Clear input field
-                    } else {
-                        alert("Wrong answer! Try again.");
-                    }
-                })
-                .catch(error => console.error('Error checking answer:', error));
+            .then(response => response.json())
+            .then(data => {
+                if (data.correct) {
+                    currentLevel++;
+                    localStorage.setItem("crypticHuntLevel", currentLevel);
+                    updateQuestion();
+                    document.getElementById("answer-input").value = "";
+                } else {
+                    alert("Wrong answer! Try again.");
+                }
+            })
+            .catch(error => console.error('Error checking answer:', error));
         }
 
         // Load the first question when the page loads
