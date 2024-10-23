@@ -3,7 +3,7 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const PORTA = 3000;
+const PORT = process.env.PORT || 3000;  // Use the port Heroku gives, or default to 3000
 
 app.use(cors());
 app.use(express.json());
@@ -14,11 +14,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Route for the home page
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Start the server
-app.listen(PORTA, () => {
-    console.log(`Server running on http://localhost:${PORTA}`);
 });
 
 // Sample level data
@@ -57,7 +52,6 @@ app.post('/check-answer', (req, res) => {
 });
 
 // Start the server
-// const PORTA = process.env.PORTA || 3000;
-// app.listen(PORTA, () => {
-//     console.log(`Server running on port ${PORTA}`);
-// });
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
